@@ -1,0 +1,12 @@
+{
+  "name": "optiland-dev",
+  "context": "..",
+  "dockerFile": "../docker/Dockerfile",
+
+  // REMOVE "workspaceFolder"
+
+  "settings": { "python.defaultInterpreterPath": "/usr/local/bin/python" },
+  "extensions": ["ms-python.python"],
+  "postCreateCommand": "pip install -e /workspaces/optiland-playground/src/optiland"
+}
+

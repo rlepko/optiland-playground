@@ -1,0 +1,11 @@
+optiland
+matplotlib
+scipy
+numpy
+pandas
+seaborn
+vtk
+tabulate
+ipykernel
+pyyaml
+requests
