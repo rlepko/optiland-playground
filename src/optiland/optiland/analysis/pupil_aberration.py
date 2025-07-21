@@ -1,6 +1,6 @@
 """Pupil Aberration Analysis
 
-The pupil abberration is defined as the difference between the paraxial
+The pupil aberration is defined as the difference between the paraxial
 and real ray intersection point at the stop surface of the optic. This is
 specified as a percentage of the on-axis paraxial stop radius at the
 primary wavelength.
@@ -19,7 +19,7 @@ from .base import BaseAnalysis
 class PupilAberration(BaseAnalysis):
     """Represents the pupil aberrations of an optic.
 
-    The pupil abberration is defined as the difference between the paraxial
+    The pupil aberration is defined as the difference between the paraxial
     and real ray intersection point at the stop surface of the optic. This is
     specified as a percentage of the on-axis paraxial stop radius at the
     primary wavelength.
