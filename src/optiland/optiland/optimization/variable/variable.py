@@ -23,6 +23,7 @@ from optiland.optimization.variable.reciprocal_radius import ReciprocalRadiusVar
 from optiland.optimization.variable.thickness import ThicknessVariable
 from optiland.optimization.variable.tilt import TiltVariable
 from optiland.optimization.variable.zernike_coeff import ZernikeCoeffVariable
+from optiland.optimization.variable.edge_thickness import EdgeThicknessVariable
 
 
 class Variable:
@@ -90,6 +91,7 @@ class Variable:
             "coeff_index",
             "axis",
             "glass_selection",
+            "edge_radius",
         }
 
     def _get_variable(self):
@@ -119,6 +121,7 @@ class Variable:
             "chebyshev_coeff": ChebyshevCoeffVariable,
             "zernike_coeff": ZernikeCoeffVariable,
             "reciprocal_radius": ReciprocalRadiusVariable,
+            "edge_thickness": EdgeThicknessVariable,
         }
 
         variable_class = variable_types.get(self.type)

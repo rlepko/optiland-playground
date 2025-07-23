@@ -13,5 +13,6 @@ from .asphere_coeff import AsphereCoeffVariable
 from .polynomial_coeff import PolynomialCoeffVariable
 from .chebyshev_coeff import ChebyshevCoeffVariable
 from .zernike_coeff import ZernikeCoeffVariable
+from .edge_thickness import EdgeThicknessVariable
 from .variable import Variable
 from .variable_manager import VariableManager
