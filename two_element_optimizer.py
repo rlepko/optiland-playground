@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from optiland import optic, optimization
 
@@ -16,7 +17,7 @@ lens.add_surface(index=1, thickness=7, radius=100.0, is_stop=True, material="N-S
 lens.add_surface(index=2, thickness=5, radius=-100.0)
 # Second lens element surfaces
 # Second lens element surfaces with finite radii
-lens.add_surface(index=3, thickness=5, radius=80.0, is_stop=True, material="N-SF11")
+lens.add_surface(index=3, thickness=5, radius=80.0, is_stop=False, material="N-SF11")
 lens.add_surface(index=4, thickness=20, radius=-80.0)
 # Image plane
 lens.add_surface(index=5)
@@ -34,6 +35,10 @@ lens.add_field(y=1.0)
 lens.add_wavelength(value=0.4861)
 lens.add_wavelength(value=0.5876, is_primary=True)
 lens.add_wavelength(value=0.6563)
+
+lens.draw()
+plt.show()
+
 
 # Update the paraxial model before optimization
 lens.update_paraxial()
@@ -100,3 +105,5 @@ res = optimizer.optimize(maxiter=256, disp=False, workers=-1)
 
 # Print final merit function value
 print("Optimization completed. Final merit:", problem.rss())
+
+lens.draw()
