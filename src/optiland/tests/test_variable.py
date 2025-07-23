@@ -174,6 +174,34 @@ class TestThicknessVariable:
         assert_allclose(self.thickness_var.get_value(), 4.4)
 
 
+class TestEdgeThicknessVariable:
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        self.optic = Objective60x()
+        self.edge_var = variable.EdgeThicknessVariable(
+            self.optic, 2, edge_radius=5.0
+        )
+
+    def test_get_value(self, set_test_backend):
+        expected = -0.5673074645035294
+        assert_allclose(self.edge_var.get_value(), expected)
+
+    def test_update_value(self, set_test_backend):
+        self.edge_var.update_value(-0.5)
+        assert_allclose(self.edge_var.get_value(), -0.5)
+
+    def test_get_value_no_scaling(self, set_test_backend):
+        self.optic = Objective60x()
+        self.edge_var = variable.EdgeThicknessVariable(
+            self.optic,
+            2,
+            edge_radius=5.0,
+            apply_scaling=False,
+        )
+        expected = 4.326925354964706
+        assert_allclose(self.edge_var.get_value(), expected)
+
+
 class TestIndexVariable:
     @pytest.fixture(autouse=True)
     def setup(self):
