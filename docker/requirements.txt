@@ -6,6 +6,7 @@ pandas
 seaborn
 vtk
 tabulate
+jupyter
 ipykernel
 pyyaml
 requests

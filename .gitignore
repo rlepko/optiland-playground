@@ -15,7 +15,10 @@ env/
 ENV/
 
 # Jupyter
-*.ipynb
+-.ipynb_checkpoints/
+-*.ipynb
++.ipynb_checkpoints/
+
 
 # Docker
 *.log
