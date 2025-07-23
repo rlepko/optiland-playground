@@ -1,5 +1,10 @@
 import numpy as np
+
+
+import matplotlib
+matplotlib.use("Agg")  # Use non-GUI backend
 import matplotlib.pyplot as plt
+
 
 from optiland import optic, optimization
 
@@ -17,7 +22,7 @@ lens.add_surface(index=1, thickness=7, radius=100.0, is_stop=True, material="N-S
 lens.add_surface(index=2, thickness=5, radius=-100.0)
 # Second lens element surfaces
 # Second lens element surfaces with finite radii
-lens.add_surface(index=3, thickness=5, radius=80.0, is_stop=False, material="N-SF11")
+lens.add_surface(index=3, thickness=5, radius=80.0, is_stop=True, material="N-SF11")
 lens.add_surface(index=4, thickness=20, radius=-80.0)
 # Image plane
 lens.add_surface(index=5)
@@ -36,12 +41,15 @@ lens.add_wavelength(value=0.4861)
 lens.add_wavelength(value=0.5876, is_primary=True)
 lens.add_wavelength(value=0.6563)
 
-lens.draw()
-plt.show()
-
-
 # Update the paraxial model before optimization
 lens.update_paraxial()
+
+
+# Draw the initial lens layout and save it
+fig = lens.draw()
+plt.savefig("two_element_before.png")
+plt.close(fig)
+
 
 # -------------------------
 # Construct optimization problem
@@ -106,4 +114,9 @@ res = optimizer.optimize(maxiter=256, disp=False, workers=-1)
 # Print final merit function value
 print("Optimization completed. Final merit:", problem.rss())
 
-lens.draw()
+
+# Draw the optimized lens layout and save it
+fig = lens.draw()
+plt.savefig("two_element_after.png")
+plt.close(fig)
+
