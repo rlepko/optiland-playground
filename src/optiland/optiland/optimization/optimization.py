@@ -687,3 +687,100 @@ class BasinHopping(OptimizerGeneric):
         self.problem.update_optics()
 
         return result
+
+
+class IpoptOptimizer(OptimizerGeneric):
+    """Optimizer using the IPOPT solver via ``cyipopt``.
+
+    This optimizer requires the optional :mod:`cyipopt` package as well as a
+    system installation of the IPOPT library. If either is missing an
+    informative :class:`ImportError` will be raised when calling
+    :meth:`optimize`.
+    """
+
+    def __init__(self, problem: OptimizationProblem):
+        super().__init__(problem)
+
+    def optimize(self, maxiter=1000, disp=False, tol=1e-8):
+        """Run IPOPT to solve the current optimization problem.
+
+        Parameters
+        ----------
+        maxiter : int, optional
+            Maximum number of iterations.  Defaults to 1000.
+        disp : bool, optional
+            Whether to print IPOPT solver output.  Defaults to ``False``.
+        tol : float, optional
+            Convergence tolerance passed to IPOPT.  Defaults to ``1e-8``.
+        """
+
+        try:
+            import cyipopt
+        except Exception as exc:  # pragma: no cover - cyipopt may be missing
+            raise ImportError(
+                "cyipopt is required to use the IpoptOptimizer"
+            ) from exc
+
+        x0 = [var.value for var in self.problem.variables]
+        self._x.append(x0)
+        x0 = be.to_numpy(x0)
+
+        bounds = tuple(var.bounds for var in self.problem.variables)
+        lb = [b[0] if b[0] is not None else -be.inf for b in bounds]
+        ub = [b[1] if b[1] is not None else be.inf for b in bounds]
+
+        class _Problem:
+            def __init__(self, optimizer):
+                self.optimizer = optimizer
+
+            def objective(self, x):
+                return self.optimizer._fun(x)
+
+            def gradient(self, x):
+                eps = be.sqrt(be.finfo(be.float64).eps)
+                grad = []
+                for i in range(len(x)):
+                    x1 = x.copy()
+                    x1[i] += eps
+                    f1 = self.optimizer._fun(x1)
+                    x2 = x.copy()
+                    x2[i] -= eps
+                    f2 = self.optimizer._fun(x2)
+                    grad.append((f1 - f2) / (2 * eps))
+                return be.to_numpy(be.array(grad))
+
+            def constraints(self, x):
+                return []
+
+            def jacobian(self, x):
+                return []
+
+            def hessianstructure(self):
+                return ([], [])
+
+            def hessian(self, x, lagrange, obj_factor):
+                return []
+
+        nlp = cyipopt.Problem(
+            n=len(x0),
+            m=0,
+            problem_obj=_Problem(self),
+            lb=lb,
+            ub=ub,
+            cl=[],
+            cu=[],
+        )
+
+        nlp.add_option("max_iter", int(maxiter))
+        nlp.add_option("tol", float(tol))
+        nlp.add_option("print_level", 5 if disp else 0)
+
+        result_x, info = nlp.solve(x0)
+
+        for i, var in enumerate(self.problem.variables):
+            var.update(result_x[i])
+
+        self.problem.update_optics()
+
+        info["x"] = result_x
+        return info

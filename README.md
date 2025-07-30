@@ -8,6 +8,7 @@ This project is a wrapper for the [Optiland](https://github.com/HarrisonKramer/o
 - Docker-based Python environment
 - VS Code Dev Container support
 - Sample script: `reverse_telephoto_example.py`
+- IPOPT optimizer integration (see `ipopt_optimizer_example.py`)
 
 ## Quickstart
 
