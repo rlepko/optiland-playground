@@ -10,3 +10,4 @@ jupyter
 ipykernel
 pyyaml
 requests
+cyipopt

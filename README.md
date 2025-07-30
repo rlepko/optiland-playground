@@ -15,3 +15,5 @@ This project is a wrapper for the [Optiland](https://github.com/HarrisonKramer/o
 1. Clone this repo:
    ```bash
    git clone https://github.com/rlepko/optiland-playground.git
+   ```
+2. Rebuild the dev container so IPOPT and cyipopt are installed.

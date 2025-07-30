@@ -4,6 +4,12 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y \
     git \
     build-essential \
+    gfortran \
+    pkg-config \
+    libblas-dev \
+    liblapack-dev \
+    coinor-libipopt-dev \
+    coinor-libipopt1v5 \
     libgl1 \
     libglu1-mesa \
     libvtk9-dev \
