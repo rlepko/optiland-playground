@@ -20,5 +20,6 @@ from .optimization import (
     DifferentialEvolution,
     SHGO,
     BasinHopping,
+    IpoptOptimizer,
 )
 from .glass_expert import GlassExpert
