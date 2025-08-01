@@ -23,7 +23,12 @@ RUN apt-get update && apt-get install -y \
 COPY docker/requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# 3. Non-root user (optional)
+# 3. MATLAB Engine environment (requires MATLAB installation)
+ENV MATLAB_ROOT=/usr/local/MATLAB
+ENV LD_LIBRARY_PATH=$MATLAB_ROOT/bin/glnxa64:$LD_LIBRARY_PATH
+ENV PYTHONPATH=$MATLAB_ROOT/extern/engines/python:$PYTHONPATH
+
+# 4. Non-root user (optional)
 RUN useradd -ms /bin/bash vscode
 USER vscode
 WORKDIR /workspace
