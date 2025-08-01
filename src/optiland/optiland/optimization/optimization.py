@@ -784,3 +784,96 @@ class IpoptOptimizer(OptimizerGeneric):
 
         info["x"] = result_x
         return info
+
+
+class MatlabFminconOptimizer(OptimizerGeneric):
+    """Optimizer that wraps MATLAB's ``fmincon`` via the MATLAB Engine API.
+
+    This optimizer requires an accessible MATLAB installation with the
+    ``matlabengine`` Python package.  The engine is imported lazily so simply
+    importing :mod:`optiland` does not require MATLAB to be installed.
+    """
+
+    def __init__(self, problem: OptimizationProblem):
+        super().__init__(problem)
+
+    def optimize(self, maxiter=1000, disp=False, tol=1e-6):
+        """Run MATLAB's ``fmincon`` to solve the current optimization problem.
+
+        Parameters
+        ----------
+        maxiter : int, optional
+            Maximum number of iterations.  Defaults to ``1000``.
+        disp : bool, optional
+            Whether to display progress information from MATLAB. Defaults to
+            ``False``.
+        tol : float, optional
+            Termination tolerance passed to ``fmincon``. Defaults to ``1e-6``.
+
+        Returns
+        -------
+        dict
+            Dictionary containing the optimized variables and solver
+            information.
+        """
+
+        try:  # pragma: no cover - matlabengine may be missing
+            import matlab.engine
+            import matlab
+        except Exception as exc:  # pragma: no cover - matlabengine may be missing
+            raise ImportError(
+                "matlab.engine is required to use the MatlabFminconOptimizer"
+            ) from exc
+
+        eng = matlab.engine.start_matlab()
+
+        x0 = [float(var.value) for var in self.problem.variables]
+        self._x.append(x0)
+
+        bounds = [var.bounds for var in self.problem.variables]
+        lb = [b[0] if b[0] is not None else float("-inf") for b in bounds]
+        ub = [b[1] if b[1] is not None else float("inf") for b in bounds]
+
+        def _objective(x):
+            return float(self._fun([float(v) for v in x]))
+
+        # Expose the Python objective to MATLAB and create a MATLAB function handle
+        eng.workspace["py_objective"] = _objective
+        eng.eval("obj_fun = @(x) py_objective(x);", nargout=0)
+
+        options = eng.optimoptions(
+            "fmincon",
+            "MaxIterations",
+            float(maxiter),
+            "OptimalityTolerance",
+            float(tol),
+            "Display",
+            "iter" if disp else "none",
+        )
+
+        x, fval, exitflag, output = eng.fmincon(
+            eng.workspace["obj_fun"],
+            matlab.double(x0),
+            [],
+            [],
+            [],
+            [],
+            matlab.double(lb),
+            matlab.double(ub),
+            nargout=4,
+            options=options,
+        )
+
+        for i, var in enumerate(self.problem.variables):
+            var.update(float(x[i]))
+
+        self.problem.update_optics()
+
+        eng.quit()
+
+        return {
+            "x": [float(v) for v in x],
+            "fun": float(fval),
+            "exitflag": int(exitflag),
+            "output": output,
+        }
